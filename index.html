@@ -10,12 +10,22 @@
 		h3 {
 		text-align: center;
 		}
+		.text-overlay {
+		position: absolute; /* Текст выводится поверх контейнера */
+		top: 0%;
+		left: 25%;
+		width: 100%;
+		transform: translate(0%, -55%); /* Центрируем текст */
+		color: white; /* Цвет текста */
+		font-size: 24px;
+		background: rgba(0, 0, 0, 0.0); /* Полупрозрачный фон */
+		}
 
 		.markertext {
 			display: none; 
 		}
 		.mapbox {
-			top: 0%;
+			top: 30px;
 			left: 0%;
 			width: 150%;
 			height: 0px;
@@ -545,26 +555,11 @@
 	</style>
 	</head>
 	<body link="#cecece" vlink="#cecece" alink="#ff0000" onload="window.scrollTo(1000, 100)">
-		<script>
-      //*  document.addEventListener('keydown', function(event) {
-      //      if (event.ctrlKey) {
-      //          const markers = document.querySelectorAll('.markertext');
-      //          markers.forEach(marker => {
-      //              marker.style.display = 'block'; // Раскрываем подсказки  
-      //          });
-      //      }
-      //  });
-      //  document.addEventListener('keyup', function(event) {
-      //    if (event.ctrlKey) {
-      //          const markers = document.querySelectorAll('.markertext');
-      //          markers.forEach(marker => {
-      //              marker.style.display = 'none'; // Скрываем подсказки  
-      //          });
-      //      }
-      //  });
-	</script>
 		<div class="mapBox">
 			<img class="fr-fic fr-dii" width="2560" height="2048" src="https://imgfy.ru/ib/wj1yzFlPyFSni12_1792428176.webp">
+				<div class="text-overlay">
+					<h3>638 тонг (2370 год) от Основания Галактической Ассамблеи</h3>
+				</div>	
 				<div class="map-markers">
 					<div class="m-marker m-markergreen coord1">
 						<div class="markertext">
