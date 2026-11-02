@@ -7,7 +7,17 @@
 		-ms-user-select: none;       /* IE10+, Edge */
 		user-select: none;           /* Стандарт */
 		}
-		
+			
+		.group-header {
+		font-weight: bold;
+		padding: 6px 0 6px 4px;
+									/* text-transform: uppercase; всё большими буквами*/
+		font-size: 14px;
+		border-bottom: 2px solid #ccc;  /* светлая граница, чтобы не сливалась с белым фоном */
+		margin-top: 10px;
+		border-radius: 4px 4px 0 0;     /* опционально: скругление сверху */
+		}
+			
 		details > summary::marker {
 		display: none;
 		content: '';
@@ -1710,33 +1720,88 @@
 					</div>
 				</div>
 			</div>
-		<script>
+		 <script>
     const markers = document.querySelectorAll('.m-marker');
     const listContainer = document.getElementById('markers-list');
 
-    // Собираем все названия вместе с ссылкой на их маркер
+    // Собираем данные о маркерах
     const markerData = [];
     markers.forEach((marker, index) => {
       const h3 = marker.querySelector('h3');
       if (!h3) return;
+
+      // Определяем цвет по классу
+      let colorGroup = 'other';
+      if (marker.classList.contains('m-markergreen')) colorGroup = 'Унатари';
+      else if (marker.classList.contains('m-markeryellow')) colorGroup = 'Мелиафаты';
+      else if (marker.classList.contains('m-markerblack')) colorGroup = 'Зетты';
+	  else if (marker.classList.contains('m-markerwhite')) colorGroup = 'Ювианцы';
+	  else if (marker.classList.contains('m-markerorange')) colorGroup = 'Можжи';
+	  else if (marker.classList.contains('m-markerbrightblue')) colorGroup = 'Катонцы';
+	  else if (marker.classList.contains('m-markerpurple')) colorGroup = 'Эфы';
+	  else if (marker.classList.contains('m-markerblue')) colorGroup = 'Финисанты';
+	  else if (marker.classList.contains('m-markergray')) colorGroup = 'Нейтраные';
+	  else if (marker.classList.contains('m-markerred')) colorGroup = 'Гэкхо';
+	  else if (marker.classList.contains('m-markerpink')) colorGroup = 'Либерио';
+	  else if (marker.classList.contains('m-markerpAlliance')) colorGroup = 'Альянс';
+
+
       markerData.push({
         name: h3.textContent,
         marker: marker,
-        index: index
+        index: index,
+        colorGroup: colorGroup
       });
     });
 
-    // Сортируем по алфавиту (по полю name)
-    markerData.sort((a, b) => a.name.localeCompare(b.name));
+    // Сортируем: сначала по группе (зелёный/жёлтый/чёрный), потом по имени
+    markerData.sort((a, b) => {
+      // Порядок групп: 
+      const groupOrder = { Альянс: 0, Унатари: 1, Можжи: 2, Катонцы: 3, Финисанты: 4, Мелиафаты: 5, Эфы: 6, Гэкхо: 7, Зетты: 8, Ювианцы: 9, Либерио: 10, Нейтраные: 11 };
+      const orderA = groupOrder[a.colorGroup] ?? 99;
+      const orderB = groupOrder[b.colorGroup] ?? 99;
 
-    // Создаём список уже в отсортированном порядке
+      if (orderA !== orderB) {
+        return orderA - orderB;
+      }
+      return a.name.localeCompare(b.name);
+    });
+
+    // Рендерим список с группировкой
+    let currentGroup = null;
+
     markerData.forEach(item => {
+      // Если группа сменилась — добавляем заголовок группы
+      if (item.colorGroup !== currentGroup) {
+        currentGroup = item.colorGroup;
+
+        const groupHeader = document.createElement('li');
+        groupHeader.className = 'group-header';
+        let label = '';
+        if (currentGroup === 'Унатари') label = 'Королевство Унатари';
+        else if (currentGroup === 'Мелиафаты') label = 'Рой Мелиофатов';
+        else if (currentGroup === 'Катонцы') label = 'Катонская Федерация';
+		else if (currentGroup === 'Финисанты') label = 'Империя Финисантов';
+		else if (currentGroup === 'Можжи') label = 'Прайды Можжи';
+		else if (currentGroup === 'Альянс') label = 'Альянс Спасеня';
+		else if (currentGroup === 'Эфы') label = 'Эфская Республика';
+		else if (currentGroup === 'Гэкхо') label = 'Империя Гек\'хо';
+		else if (currentGroup === 'Зетты') label = 'Зетты';
+		else if (currentGroup === 'Ювианцы') label = 'Ювианцы';
+		else if (currentGroup === 'Либерио') label = 'Либерио';
+		else if (currentGroup === 'Нейтраные') label = 'Нейтраные';
+        else label = 'Прочие';
+
+        groupHeader.textContent = label;
+        listContainer.appendChild(groupHeader);
+      }
+
       const li = document.createElement('li');
       li.textContent = item.name;
       li.dataset.index = item.index;
 
       li.addEventListener('click', (e) => {
-        e.stopPropagation(); // чтобы клик по li не сразу уходил на document
+        e.stopPropagation();
         resetAll();
         
         item.marker.classList.add('focused');
@@ -1748,7 +1813,6 @@
       listContainer.appendChild(li);
     });
 
-    // Сброс выделения по любому клику вне маркеров и панели
     document.addEventListener('dblclick', () => {
       resetAll();
     });
@@ -1757,6 +1821,6 @@
       markers.forEach(m => m.classList.remove('focused'));
       listContainer.querySelectorAll('li').forEach(l => l.classList.remove('active'));
     }
-			</script>
+		  </script>
 		</body>
 	</html>
