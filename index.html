@@ -1702,7 +1702,7 @@
 							</details>
 						</div>
 					</div>
-					<div class="m-marker m-markergray coord99">
+					<div class="m-marker m-markergray coord99" data-group="Финисанты">
 						<div class="markertext">
 							<details>
 								<summary>
@@ -1734,8 +1734,11 @@
       const h3 = marker.querySelector('h3');
       if (!h3) return;
 
-      // Определяем цвет по классу
-      let colorGroup = 'other';
+
+	  // Определяем группу: сначала смотрим data-group, потом класс цвета
+	  let colorGroup = marker.dataset.group || 'other';
+      // Определяем цвет групп по классу
+	  if (colorGroup === 'other') {
       if (marker.classList.contains('m-markergreen')) colorGroup = 'Унатари';
       else if (marker.classList.contains('m-markeryellow')) colorGroup = 'Мелиафаты';
       else if (marker.classList.contains('m-markerblack')) colorGroup = 'Зетты';
