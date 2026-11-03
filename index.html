@@ -753,7 +753,7 @@
 							</details>
 						</div>
 					</div>
-					<div class="m-marker m-markergreen coord5" data-order="1000">
+					<div class="m-marker m-markergreen coord5" data-order="last">
 						<div class="markertext">
 							<details>
 								<summary>
@@ -773,7 +773,7 @@
 							</details>
 						</div>
 					</div>
-					<div class="m-marker m-markergreen coord7" data-order="1001">
+					<div class="m-marker m-markergreen coord7" data-order="last">
 						<div class="markertext">
 							<details>
 								<summary>
@@ -1761,7 +1761,7 @@
       });
     });
 
-    // Сортируем: сначала по группе (зелёный/жёлтый/чёрный), потом по имени
+   	 // 1. Сортируем: сначала по группе (зелёный/жёлтый/чёрный), потом по имени
     markerData.sort((a, b) => {
       // Порядок групп: 
       const groupOrder = { Альянс: 0, Унатари: 1, Можжи: 2, Катонцы: 3, Финисанты: 4, Мелиафаты: 5, Эфы: 6, Гэкхо: 7, Зетты: 8, Ювианцы: 9, Либерио: 10, Нейтраные: 11 };
@@ -1771,14 +1771,28 @@
       if (orderA !== orderB) {
         return orderA - orderB;
       }
- 	 // Принудительный порядок: маркеры с data-order идут выше остальных
-	  const customA = a.marker.dataset.order;
-	  const customB = b.marker.dataset.order;
-	  if (customA !== undefined && customB !== undefined) {
-	    return Number(customA) - Number(customB);
+	  // 2. Ранги внутри группы:
+	  //    число в data-order  → ранг 0
+	  //    без атрибута        → ранг 1
+	  //    data-order="last"   → ранг 2
+	  const valA = a.marker.dataset.order;
+	  const valB = b.marker.dataset.order;
+
+	  const rankA = valA === 'last' ? 2 : (valA !== undefined ? 0 : 1);
+	  const rankB = valB === 'last' ? 2 : (valB !== undefined ? 0 : 1);
+
+	  if (rankA !== rankB) {
+	    return rankA - rankB;
 	  }
-	  if (customA !== undefined) return -1;   // a — раньше
-	  if (customB !== undefined) return 1;    // b — раньше
+
+	  // 3. Внутри ранга 0 — по возрастанию числа (5 выше, чем 10);
+	  //    при равных числах — по алфавиту
+	  if (rankA === 0) {
+ 	   const numDiff = Number(valA) - Number(valB);
+ 	   if (numDiff !== 0) {
+ 	     return numDiff;
+ 	   }
+	  }
 
 	  return a.name.localeCompare(b.name);
 	});
