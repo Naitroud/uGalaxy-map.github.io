@@ -11,7 +11,13 @@
 		-ms-user-select: none;       /* IE10+, Edge */
 		user-select: none;           /* Стандарт */
 		}
-			
+		.marker-crown {
+		width: 18px;
+		height: 18px;
+		margin-left: 8px;          /* отступ от текста до короы */
+		vertical-align: middle;     /* чтобы корона была по центру строки */
+		display: inline-block;
+		}	
 		.group-header {
 		font-weight: bold;
 		padding: 6px 0 6px 4px;
@@ -1842,6 +1848,14 @@
 
       const li = document.createElement('li');
       li.textContent = item.name;
+		if (item.marker.dataset.order === '0') {
+			const crown = document.createElement('img');
+			crown.src = 'https://cdn-icons-png.flaticon.com/512/2502/2502739.png';
+			crown.alt = '👑';
+			crown.className = 'marker-crown';
+			// Вставляем иконку после текста
+			li.appendChild(crown);
+		}
       li.dataset.index = item.index;
 
       li.addEventListener('click', (e) => {
