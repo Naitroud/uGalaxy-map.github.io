@@ -1771,8 +1771,17 @@
       if (orderA !== orderB) {
         return orderA - orderB;
       }
-      return a.name.localeCompare(b.name);
-    });
+ 	 // Принудительный порядок: маркеры с data-order идут выше остальных
+	  const customA = a.marker.dataset.order;
+	  const customB = b.marker.dataset.order;
+	  if (customA !== undefined && customB !== undefined) {
+	    return Number(customA) - Number(customB);
+	  }
+	  if (customA !== undefined) return -1;   // a — раньше
+	  if (customB !== undefined) return 1;    // b — раньше
+
+	  return a.name.localeCompare(b.name);
+	});
 
     // Рендерим список с группировкой
     let currentGroup = null;
