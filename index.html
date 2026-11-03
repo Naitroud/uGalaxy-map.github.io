@@ -753,7 +753,7 @@
 							</details>
 						</div>
 					</div>
-					<div class="m-marker m-markergreen coord5" data-order="last">
+					<div class="m-marker m-markergreen coord5" data-order="last:1">
 						<div class="markertext">
 							<details>
 								<summary>
@@ -773,7 +773,7 @@
 							</details>
 						</div>
 					</div>
-					<div class="m-marker m-markergreen coord7" data-order="last">
+					<div class="m-marker m-markergreen coord7" data-order="last:2">
 						<div class="markertext">
 							<details>
 								<summary>
@@ -1771,27 +1771,41 @@
       if (orderA !== orderB) {
         return orderA - orderB;
       }
-	  // 2. Ранги внутри группы:
-	  //    число в data-order  → ранг 0
-	  //    без атрибута        → ранг 1
-	  //    data-order="last"   → ранг 2
+	 // 2. Ранг внутри группы:
+	  //    число          → ранг 0
+	  //    без атрибута   → ранг 1
+	  //    last или last:N → ранг 2
 	  const valA = a.marker.dataset.order;
 	  const valB = b.marker.dataset.order;
 
-	  const rankA = valA === 'last' ? 2 : (valA !== undefined ? 0 : 1);
-	  const rankB = valB === 'last' ? 2 : (valB !== undefined ? 0 : 1);
+	  const isLast = v => typeof v === 'string' && v.startsWith('last');
+	  const rankA = isLast(valA) ? 2 : (valA !== undefined ? 0 : 1);
+	  const rankB = isLast(valB) ? 2 : (valB !== undefined ? 0 : 1);
 
 	  if (rankA !== rankB) {
 	    return rankA - rankB;
 	  }
 
-	  // 3. Внутри ранга 0 — по возрастанию числа (5 выше, чем 10);
-	  //    при равных числах — по алфавиту
+	  // 3. Внутри ранга 0 — по возрастанию числа
 	  if (rankA === 0) {
- 	   const numDiff = Number(valA) - Number(valB);
+	    const numDiff = Number(valA) - Number(valB);
  	   if (numDiff !== 0) {
- 	     return numDiff;
- 	   }
+	      return numDiff;
+	    }
+	  }
+
+	  // 4. Внутри ранга 2 — по номеру в last:N (5 выше, чем 10);
+	  //    простой last без номера считается как last:Infinity — он в самом низу
+	  if (rankA === 2) {
+	    const parseLast = v => {
+	      if (v === 'last') return Infinity;
+	      const m = v.match(/^last:(\d+)$/);
+	      return m ? Number(m[1]) : Infinity;
+	    };
+	    const numDiff = parseLast(valA) - parseLast(valB);
+	    if (numDiff !== 0) {
+	      return numDiff;
+	    }
 	  }
 
 	  return a.name.localeCompare(b.name);
