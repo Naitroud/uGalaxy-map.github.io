@@ -1807,13 +1807,13 @@
         item.marker.classList.add('focused');
         li.classList.add('active');
 
-        item.marker.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        item.marker.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center'});
       });
 
       listContainer.appendChild(li);
     });
 
-    document.addEventListener('dblclick', () => {
+    document.addEventListener('click', () => {
       resetAll();
     });
 
