@@ -201,7 +201,7 @@
 			color: #fff;
 			padding: 10px 10px;
 			border: 1px solid #444;
-				z-index: 1000
+			z-index: 1000
 		}
 		</style>
 		<style> /* стили связанные с сотелитами */
@@ -269,12 +269,14 @@
   z-index: 9;
 }
 .satellite:hover .satellite-tooltip {
-  opacity: 1;
-  background: rgba(0,0,0,.6);
-  visibility: visible;
-  transform: translateX(-50%) translateY(4px);
-	z-index: 20;
-
+    opacity: 1;
+	background: rgba(0,0,0,.6);
+ 	visibility: visible;
+  	transform: translateX(-50%) translateY(4px);
+	border: 1px solid #444;
+}
+.satellite:hover {
+  	z-index: 20;
 }
 /* Стили для details/summary внутри подсказки */
 .satellite-tooltip details {
