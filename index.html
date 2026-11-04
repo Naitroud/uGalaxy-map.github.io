@@ -201,11 +201,12 @@
 			color: #fff;
 			padding: 10px 10px;
 			border: 1px solid #444;
+				z-index: 1000
 		}
 		</style>
 		<style> /* стили связанные с сотелитами */
 				
-.satellite {
+  .satellite {
   position: absolute;
   width: 10px;
   height: 10px;
@@ -271,7 +272,8 @@
   opacity: 1;
   background: rgba(0,0,0,.6);
   visibility: visible;
-  transform: translateX(-50%) translateY(4px);*/
+  transform: translateX(-50%) translateY(4px);
+	z-index: 20;
 
 }
 /* Стили для details/summary внутри подсказки */
@@ -289,6 +291,11 @@
   margin: 0;
   text-align: center;
 }
+			.satellite details summary {
+		display: flex;
+		justify-content: center; /* центрирует по горизонтали */
+		align-items: center;      /* центрирует по вертикали (если есть высота) */
+		}
 		
 		</style>		
 		<style> /* Стили координат и маркеров */
