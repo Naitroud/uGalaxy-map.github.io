@@ -4,7 +4,7 @@
 		  <title>Карта Галактики</title>
 		  <link rel="icon" type="image/webp" href="	https://cdn.discordapp.com/icons/754063621595594855/276fe73e6747adac2e8488f8ef5c6923.webp">
 	
-		<style>
+		<style> /* Основные стили */
 		* {
 		-webkit-user-select: none;   /* Chrome, Safari, Opera */
 		-moz-user-select: none;      /* Firefox */
@@ -186,9 +186,112 @@
 			width: 100%;
 			height: 100%;
 		}
-		
+		    .m-marker:hover:not(:has(.satellite:hover)) .markertext,
+			.markertext:hover {
+			display: block;
+			width: 250px;
+			position: absolute;
+			left: -200%;
+			top: -250%;
+			background: rgba(20,20,20,0.6);
+			font-family: Verdana, "Open Sans", Arial, "Helvetica Neue", Helvetica, sans-serif;
+			font-size: 14px;
+			line-height: 15px;
+			border-radius: 8px;
+			color: #fff;
+			padding: 10px 10px;
+			border: 1px solid #444;
+		}
 		</style>
-<style>
+		<style> /* стили связанные с сотелитами */
+				
+.satellite {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  z-index: 5;
+  cursor: pointer;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Псевдоэлемент для иконки */
+.satellite::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* Картинка для типа «Альянс» */
+.satellite-ally::after {
+  background-image: url('FleetAlly.png');
+}
+/* Картинка для типа «Враг» */
+.satellite-enemy::after {
+  background-image: url('FleetEnemy.png');
+}
+/* Картинка для типа «Инфо» */
+.satellite-Neutral::after {
+  background-image: url('fleetNeutral.png');
+}
+/* Картинка для типа «Инфо» */
+.satellite-Friend::after {
+  background-image: url('FleetFriend.png');
+}
+/* Расставляем сателлиты в ряд (например, над маркером) */
+.satellite:nth-child(1) { top: 0px; left: 12px; }
+.satellite:nth-child(2) { top: -0px; left: 24px; }
+.satellite:nth-child(3) { top: -0px; left: 36px; }
+.satellite:nth-child(4) { top: -0px; left: 48px; }
+
+.satellite-tooltip {
+  position: absolute;
+  left: 200%;
+  top: -30px;          /* центрируем по горизонтали */
+  width: 100px;
+  transform: translateX(-50%);
+  padding: 6px 10px;
+  background: #333;
+  color: #fff;
+  font-size: 12px;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;          /* скрыта по умолчанию */
+  visibility: hidden;   /* и не занимает место в потоке */
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 9;
+}
+.satellite:hover .satellite-tooltip {
+  opacity: 1;
+  background: rgba(0,0,0,.6);
+  visibility: visible;
+  transform: translateX(-50%) translateY(4px);*/
+
+}
+/* Стили для details/summary внутри подсказки */
+.satellite-tooltip details {
+  margin-top: 6px;
+  border: none;
+  background: transparent;
+}
+.satellite-tooltip summary {
+  list-style: none;
+  cursor: pointer;
+  color: #fff;      /* цвет заголовка details */
+  font-weight: bold;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+}
+		
+		</style>		
+		<style> /* Стили координат и маркеров */
 		
 		.m-markeryellow {
 			width: 11px;
@@ -286,21 +389,7 @@
             position: absolute;
             filter: drop-shadow(0 0 3px #000)
                 }
-		.m-marker:hover .markertext,.markertext:hover {
-			display: block;
-			width: 250px;
-			position: absolute;
-			left: -200%;
-			top: -250%;
-			background: rgba(20,20,20,0.6);
-			font-family: Verdana, "Open Sans", Arial, "Helvetica Neue", Helvetica, sans-serif;
-			font-size: 14px;
-			line-height: 15px;
-			border-radius: 8px;
-			color: #fff;
-			padding: 10px 10px;
-			border: 1px solid #444;
-		}
+
 		
 .coord1{
                         top: 518px;
@@ -760,6 +849,13 @@
 						</div>
 					</div>
 					<div class="m-marker m-markergreen coord5" data-order="last:1">
+					<div class="satellite satellite-Friend"></div>
+					  <div class="satellite satellite-Neutral"></div>
+					    <div class="satellite satellite-ally"></div>
+						  <div class="satellite satellite-enemy"></div>
+
+
+
 						<div class="markertext">
 							<details>
 								<summary>
