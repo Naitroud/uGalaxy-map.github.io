@@ -207,7 +207,7 @@
   .satellite {
   position: absolute;
   width: 10px;
-  height: 10px;
+  height: 11px;
   z-index: 5;
   cursor: pointer;
   border-radius: 50%;
@@ -296,6 +296,12 @@
 		justify-content: center; /* центрирует по горизонтали */
 		align-items: center;      /* центрирует по вертикали (если есть высота) */
 		}
+			.satellite-list-icon {
+  width: 14px;
+  height: 16px;
+  vertical-align: middle;
+  margin-left: 6px;
+}
 		
 		</style>		
 		<style> /* Стили координат и маркеров */
@@ -859,7 +865,7 @@
 					<div class="satellite satellite-Friend">
 						<div class="satellite-tooltip">
 							<details>
-								<summary>Великая Армада</summary>
+								<summary><h3></h3>Великая Армада</h3></summary>
 								<p></p>
 							</details>
 						</div>
@@ -869,7 +875,7 @@
 						  <div class="satellite satellite-enemy">
 							  <div class="satellite-tooltip">
 								  <details
-									  ><summary>Флот Зеттов</summary>
+									  ><summary><h3>Флот Зеттов</h3></summary>
 									  <p></p>
 								  </details>
 							  </div>
@@ -1845,154 +1851,203 @@
 				</div>
 			</div>
 		 <script>
-    const markers = document.querySelectorAll('.m-marker');
-    const listContainer = document.getElementById('markers-list');
+const markers = document.querySelectorAll('.m-marker');
+const listContainer = document.getElementById('markers-list');
 
-    // Собираем данные о маркерах
-    const markerData = [];
-    markers.forEach((marker, index) => {
-      const h3 = marker.querySelector('h3');
-      if (!h3) return;
+// --> Сателлиты: подписи для сателлитов без своего заголовка
+const satClassNames = {
+  'satellite-ally':    'Флот Альянса',
+  'satellite-enemy':   'Флот противника',
+  'satellite-Neutral': 'Нейтральный флот',
+  'satellite-Friend':  'Союзный флот'
+};
 
+// Собираем данные о маркерах
+const markerData = [];
+markers.forEach((marker, index) => {
+  // --> Сателлиты: ИСПРАВЛЕНО — берём h3 только из markertext,
+  // иначе первым найдётся h3 из подсказки сателлита
+  const h3 = marker.querySelector('.markertext h3');
+  if (!h3) return;
 
-	  // Определяем группу: сначала смотрим data-group, потом класс цвета
-	  let colorGroup = marker.dataset.group || 'other';
-      // Определяем цвет групп по классу
-	  if (colorGroup === 'other') {
-      if (marker.classList.contains('m-markergreen')) colorGroup = 'Унатари';
-      else if (marker.classList.contains('m-markeryellow')) colorGroup = 'Мелиафаты';
-      else if (marker.classList.contains('m-markerblack')) colorGroup = 'Зетты';
-	  else if (marker.classList.contains('m-markerwhite')) colorGroup = 'Ювианцы';
-	  else if (marker.classList.contains('m-markerorange')) colorGroup = 'Можжи';
-	  else if (marker.classList.contains('m-markerbrightblue')) colorGroup = 'Катонцы';
-	  else if (marker.classList.contains('m-markerpurple')) colorGroup = 'Эфы';
-	  else if (marker.classList.contains('m-markerblue')) colorGroup = 'Финисанты';
-	  else if (marker.classList.contains('m-markergray')) colorGroup = 'Нейтраные';
-	  else if (marker.classList.contains('m-markerred')) colorGroup = 'Гэкхо';
-	  else if (marker.classList.contains('m-markerpink')) colorGroup = 'Либерио';
-	  else if (marker.classList.contains('m-markerpAlliance')) colorGroup = 'Альянс';
-	  }
+  let colorGroup = marker.dataset.group || 'other';
+  if (colorGroup === 'other') {
+    if (marker.classList.contains('m-markergreen')) colorGroup = 'Унатари';
+    else if (marker.classList.contains('m-markeryellow')) colorGroup = 'Мелиафаты';
+    else if (marker.classList.contains('m-markerblack')) colorGroup = 'Зетты';
+    else if (marker.classList.contains('m-markerwhite')) colorGroup = 'Ювианцы';
+    else if (marker.classList.contains('m-markerorange')) colorGroup = 'Можжи';
+    else if (marker.classList.contains('m-markerbrightblue')) colorGroup = 'Катонцы';
+    else if (marker.classList.contains('m-markerpurple')) colorGroup = 'Эфы';
+    else if (marker.classList.contains('m-markerblue')) colorGroup = 'Финисанты';
+    else if (marker.classList.contains('m-markergray')) colorGroup = 'Нейтраные';
+    else if (marker.classList.contains('m-markerred')) colorGroup = 'Гэкхо';
+    else if (marker.classList.contains('m-markerpink')) colorGroup = 'Либерио';
+    else if (marker.classList.contains('m-markerpAlliance')) colorGroup = 'Альянс';
+  }
 
-      markerData.push({
-        name: h3.textContent,
-        marker: marker,
-        index: index,
-        colorGroup: colorGroup
-      });
-    });
+  markerData.push({
+    name: h3.textContent,
+    marker: marker,
+    index: index,
+    colorGroup: colorGroup
+  });
 
-   	 // 1. Сортируем: сначала по группе (зелёный/жёлтый/чёрный), потом по имени
-    markerData.sort((a, b) => {
-      // Порядок групп: 
-      const groupOrder = { Альянс: 0, Унатари: 1, Можжи: 2, Катонцы: 3, Финисанты: 4, Мелиафаты: 5, Эфы: 6, Гэкхо: 7, Зетты: 8, Ювианцы: 9, Либерио: 10, Нейтраные: 11 };
-      const orderA = groupOrder[a.colorGroup] ?? 99;
-      const orderB = groupOrder[b.colorGroup] ?? 99;
-
-      if (orderA !== orderB) {
-        return orderA - orderB;
-      }
-	 // 2. Ранг внутри группы:
-	  //    число          → ранг 0
-	  //    без атрибута   → ранг 1
-	  //    last или last:N → ранг 2
-	  const valA = a.marker.dataset.order;
-	  const valB = b.marker.dataset.order;
-
-	  const isLast = v => typeof v === 'string' && v.startsWith('last');
-	  const rankA = isLast(valA) ? 2 : (valA !== undefined ? 0 : 1);
-	  const rankB = isLast(valB) ? 2 : (valB !== undefined ? 0 : 1);
-
-	  if (rankA !== rankB) {
-	    return rankA - rankB;
-	  }
-
-	  // 3. Внутри ранга 0 — по возрастанию числа
-	  if (rankA === 0) {
-	    const numDiff = Number(valA) - Number(valB);
- 	   if (numDiff !== 0) {
-	      return numDiff;
-	    }
-	  }
-
-	  // 4. Внутри ранга 2 — по номеру в last:N (5 выше, чем 10);
-	  //    простой last без номера считается как last:Infinity — он в самом низу
-	  if (rankA === 2) {
-	    const parseLast = v => {
-	      if (v === 'last') return Infinity;
-	      const m = v.match(/^last:(\d+)$/);
-	      return m ? Number(m[1]) : Infinity;
-	    };
-	    const numDiff = parseLast(valA) - parseLast(valB);
-	    if (numDiff !== 0) {
-	      return numDiff;
-	    }
-	  }
-
-	  return a.name.localeCompare(b.name);
-	});
-
-    // Рендерим список с группировкой
-    let currentGroup = null;
-
-    markerData.forEach(item => {
-      // Если группа сменилась — добавляем заголовок группы
-      if (item.colorGroup !== currentGroup) {
-        currentGroup = item.colorGroup;
-
-        const groupHeader = document.createElement('li');
-        groupHeader.className = 'group-header';
-        let label = '';
-        if (currentGroup === 'Унатари') label = 'Королевство Унатари';
-        else if (currentGroup === 'Мелиафаты') label = 'Рой Мелиофатов';
-        else if (currentGroup === 'Катонцы') label = 'Катонская Федерация';
-		else if (currentGroup === 'Финисанты') label = 'Империя Финисантов';
-		else if (currentGroup === 'Можжи') label = 'Прайды Можжи';
-		else if (currentGroup === 'Альянс') label = 'Альянс Спасеня';
-		else if (currentGroup === 'Эфы') label = 'Эфская Республика';
-		else if (currentGroup === 'Гэкхо') label = 'Империя Гек\'хо';
-		else if (currentGroup === 'Зетты') label = 'Зетты';
-		else if (currentGroup === 'Ювианцы') label = 'Ювианцы';
-		else if (currentGroup === 'Либерио') label = 'Либерио';
-		else if (currentGroup === 'Нейтраные') label = 'Нейтраные';
-        else label = 'Прочие';
-
-        groupHeader.textContent = label;
-        listContainer.appendChild(groupHeader);
-      }
-
-      const li = document.createElement('li');
-      li.textContent = item.name;
-		if (item.marker.dataset.order === '0') {
-			const crown = document.createElement('img');
-			crown.src = 'https://cdn-icons-png.flaticon.com/512/2502/2502739.png';
-			crown.alt = '👑';
-			crown.className = 'marker-crown';
-			// Вставляем иконку после текста
-			li.appendChild(crown);
-		}
-      li.dataset.index = item.index;
-
-      li.addEventListener('click', (e) => {
-        e.stopPropagation();
-        resetAll();
-        
-        item.marker.classList.add('focused');
-        li.classList.add('active');
-
-        item.marker.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center'});
-      });
-
-      listContainer.appendChild(li);
-    });
-
-    document.addEventListener('click', () => {
-      resetAll();
-    });
-
-    function resetAll() {
-      markers.forEach(m => m.classList.remove('focused'));
-      listContainer.querySelectorAll('li').forEach(l => l.classList.remove('active'));
+  // --> Сателлиты: добавляем каждый сателлит маркера как отдельный пункт
+  marker.querySelectorAll('.satellite').forEach((sat, satIndex) => {
+    // имя: своя подсказка, если есть (как у ally) — иначе по классу типа
+    const satH3 = sat.querySelector('.satellite-tooltip h3');
+    let satName = satH3 ? satH3.textContent.trim() : '';
+    if (!satName) {
+      satName = Object.entries(satClassNames)
+        .find(([cls]) => sat.classList.contains(cls))?.[1]
+        || 'Флот ' + (satIndex + 1);
     }
+
+    markerData.push({
+      name: satName,
+      marker: sat,            // объект для клика — сам сателлит
+      index: index,           // привязка к маркеру, чтобы подсвечивался и родитель
+      colorGroup: 'Флоты',    // --> своя группа
+      isSatellite: true
+    });
+  });
+});
+
+// Сортировка — твоя логика, добавил только порядок группы «Флоты» в конец
+markerData.sort((a, b) => {
+  const groupOrder = {
+    Альянс: 0, Унатари: 1, Можжи: 2, Катонцы: 3, Финисанты: 4,
+    Мелиафаты: 5, Эфы: 6, Гэкхо: 7, Зетты: 8, Ювианцы: 9,
+    Либерио: 10, Нейтраные: 11,
+    Флоты: 12           // --> Сателлиты: отдельная группа в конце списка
+  };
+  const orderA = groupOrder[a.colorGroup] ?? 99;
+  const orderB = groupOrder[b.colorGroup] ?? 99;
+  if (orderA !== orderB) return orderA - orderB;
+
+  const valA = a.marker.dataset.order;
+  const valB = b.marker.dataset.order;
+
+  const isLast = v => typeof v === 'string' && v.startsWith('last');
+  const rankA = isLast(valA) ? 2 : (valA !== undefined ? 0 : 1);
+  const rankB = isLast(valB) ? 2 : (valB !== undefined ? 0 : 1);
+  if (rankA !== rankB) return rankA - rankB;
+
+  if (rankA === 0) {
+    const numDiff = Number(valA) - Number(valB);
+    if (numDiff !== 0) return numDiff;
+  }
+
+  if (rankA === 2) {
+    const parseLast = v => {
+      if (v === 'last') return Infinity;
+      const m = v.match(/^last:(\d+)$/);
+      return m ? Number(m[1]) : Infinity;
+    };
+    const numDiff = parseLast(valA) - parseLast(valB);
+    if (numDiff !== 0) return numDiff;
+  }
+
+  return a.name.localeCompare(b.name);
+});
+
+// Рендерим список с группировкой
+let currentGroup = null;
+
+markerData.forEach(item => {
+  if (item.colorGroup !== currentGroup) {
+    currentGroup = item.colorGroup;
+
+    const groupHeader = document.createElement('li');
+    groupHeader.className = 'group-header';
+    let label = '';
+    if (currentGroup === 'Унатари') label = 'Королевство Унатари';
+    else if (currentGroup === 'Мелиафаты') label = 'Рой Мелиофатов';
+    else if (currentGroup === 'Катонцы') label = 'Катонская Федерация';
+    else if (currentGroup === 'Финисанты') label = 'Империя Финисантов';
+    else if (currentGroup === 'Можжи') label = 'Прайды Можжи';
+    else if (currentGroup === 'Альянс') label = 'Альянс Спасеня';
+    else if (currentGroup === 'Эфы') label = 'Эфская Республика';
+    else if (currentGroup === 'Гэкхо') label = "Империя Гек'хо";
+    else if (currentGroup === 'Зетты') label = 'Зетты';
+    else if (currentGroup === 'Ювианцы') label = 'Ювианцы';
+    else if (currentGroup === 'Либерио') label = 'Либерио';
+    else if (currentGroup === 'Нейтраные') label = 'Нейтраные';
+    else if (currentGroup === 'Флоты') label = 'Флоты'; // --> Сателлиты
+    else label = 'Прочие';
+
+    groupHeader.textContent = label;
+    listContainer.appendChild(groupHeader);
+  }
+
+const li = document.createElement('li');
+
+const satIcons = {
+  'satellite-ally':    'resources/FleetAlly.png',
+  'satellite-enemy':   'resources/FleetEnemy.png',
+  'satellite-Neutral': 'resources/fleetNeutral.png',
+  'satellite-Friend':  'resources/FleetFriend.png'
+};
+
+// ВАЖНО: имя добавляем через appendChild, а не textContent,
+// иначе textContent сотрёт значок
+li.appendChild(document.createTextNode(item.name));
+// Значок типа флота для сателлитов
+if (item.isSatellite) {
+  const typeCls = Object.keys(satIcons).find(c => item.marker.classList.contains(c));
+  if (typeCls) {
+    const icon = document.createElement('img');
+    icon.src = satIcons[typeCls];
+    icon.alt = '';
+    icon.className = 'satellite-list-icon';
+    li.appendChild(icon);
+  }
+}
+
+// Корона — только для обычных маркеров
+if (!item.isSatellite && item.marker.dataset.order === '0') {
+  const crown = document.createElement('img');
+  crown.src = 'https://cdn-icons-png.flaticon.com/512/2502/2502739.png';
+  crown.alt = '👑';
+  crown.className = 'marker-crown';
+  li.appendChild(crown);
+}
+
+li.dataset.index = item.index;
+
+  li.addEventListener('click', (e) => {
+    e.stopPropagation();
+    resetAll();
+
+    // --> Сателлиты: подсвечиваем сателлит, если пункт из группы «Флоты»
+    if (item.isSatellite) {
+      item.marker.classList.add('satellite-focused');
+      // и заодно подсвечиваем родительский маркер — так проще найти точку на карте
+      item.marker.closest('.m-marker')?.classList.add('focused');
+    } else {
+      item.marker.classList.add('focused');
+    }
+
+    li.classList.add('active');
+
+    item.marker.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+  });
+
+  listContainer.appendChild(li);
+});
+
+document.addEventListener('click', () => {
+  resetAll();
+});
+
+function resetAll() {
+  // --> Сателлиты: сбрасываем и подсветку сателлитов
+  markers.forEach(m => m.classList.remove('focused'));
+  document.querySelectorAll('.satellite.satellite-focused')
+    .forEach(s => s.classList.remove('satellite-focused'));
+  listContainer.querySelectorAll('li').forEach(l => l.classList.remove('active'));
+}
 		  </script>
 		</body>
 	</html>
